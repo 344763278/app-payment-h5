@@ -4,6 +4,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import '@/common/css/reset.css'
+import '@/common/css/font-awesome.css'
+import kuUi from '@/base/ku-ui'
+Vue.use(kuUi) 
 
 Vue.config.productionTip = false
 

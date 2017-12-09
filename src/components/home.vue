@@ -9,16 +9,16 @@
                 <input type="text" placeholder="请输入验证码" autocomplete="off">
                 <span class="get-code">获取验证码</span>
             </p>
-        </div>  
-        <button class="submit">确认收款</button>
+        </div>
+        <button class="submit" @click="getMoney">确认收款</button>
         <div class="tips">
             <span>收不到短信？<i class="get-video-code">获取语音验证码</i></span>
-        </div> 
+        </div>
         <div class="phone-calling">
             <p>电话拨打中...请留意来电</p>
             <p><span>60</span>S后重试</p>
         </div>
-        <div class="msg-box-wrap">
+        <div class="msg-box-wrap" v-show="msgTipShow">
             <div class="msg-box">
                 <h3 class="tit">接收短信验证码</h3>
                 <p class="content">验证码以短信形式通知你，请留意你的电话</p>
@@ -26,18 +26,33 @@
                     <span class="cancel">取消</span>
                     <span class="ok">接收</span>
                 </p>
-            </div> 
+            </div>
         </div>
+        <div v-kiko-loading.fullscreen="loadingFullscreen"></div> 
     </div>
 </template>
 <script>
 export default {
-    name: 'home',
     data() {
         return {
-            msg: 'Welcome to Your Vue.js App'
+            msgTipShow: false,
+            loadingFullscreen: false
+        }
+    },
+    methods: {
+        getMoney() { 
+            this.$kiko_message('操作成功')
+            this.loadingFullscreen = true 
+            setTimeout(() => {
+                this.loadingFullscreen = false
+                this.loading = false
+            }, 2000)
+        },
+        confirmMakeSure() {
+            console.log('confirm')
         }
     }
+
 }
 
 </script>
@@ -46,9 +61,9 @@ export default {
 // @import '../common/css/mixin'; 
 .home-wrap {
     width: 7.5rem;
-    height: 100%; 
-    padding-top: 1.6rem; 
-    background: url(../common/img/bg.png) 0 0 no-repeat; 
+    height: 100%;
+    padding-top: 1.6rem;
+    background: url(../common/img/bg.png) 0 0 no-repeat;
     background-size: 7.5rem 5.89rem;
     font-family: 'PingFang-SC-Medium';
     position: relative;
@@ -61,11 +76,12 @@ export default {
     }
     .input-box {
         width: 6.54rem;
-        height: 2.4rem; 
+        height: 2.4rem;
         border-radius: 0.08rem;
         background-color: #fff;
         margin: 1.1rem auto 0 auto;
-        .phone, .code {
+        .phone,
+        .code {
             height: 1.2rem;
             line-height: 1.2rem;
             padding: 0 2rem 0 0.66rem;
@@ -78,30 +94,34 @@ export default {
                 width: 100%;
                 font-size: 0.3rem;
                 box-sizing: border-box;
-                color: #666;  
+                color: #666;
             }
-            ::-webkit-input-placeholder {
-              color: #ccc;
-              font-family: 'PingFang-SC-Medium';
-            };
-            :-moz-placeholder {
-              color: #ccc;
-              font-family: 'PingFang-SC-Medium';
-            };
-            ::-moz-placeholder {
-              color: #ccc;
-              font-family: 'PingFang-SC-Medium';
-            };
-            :-ms-input-placeholder {
-              color: #ccc;
-              font-family: 'PingFang-SC-Medium';
-            };
+             ::-webkit-input-placeholder {
+                color: #ccc;
+                font-family: 'PingFang-SC-Medium';
+            }
+            ;
+             :-moz-placeholder {
+                color: #ccc;
+                font-family: 'PingFang-SC-Medium';
+            }
+            ;
+             ::-moz-placeholder {
+                color: #ccc;
+                font-family: 'PingFang-SC-Medium';
+            }
+            ;
+             :-ms-input-placeholder {
+                color: #ccc;
+                font-family: 'PingFang-SC-Medium';
+            }
+            ;
         }
         .code {
             background: url(../common/img/ico_suo.png) 0.24rem 0.38rem no-repeat;
             background-size: 0.32rem 0.40rem;
             border-top: 1px solid #f3f3f3;
-            position: relative; 
+            position: relative;
             .get-code {
                 font-size: 0.28rem;
                 color: #666;
@@ -110,8 +130,8 @@ export default {
                 top: 0.4rem;
                 height: 0.4rem;
                 line-height: 0.4rem;
-                display: inline; 
-            } 
+                display: inline;
+            }
         }
     }
     .submit {
@@ -125,7 +145,8 @@ export default {
         background-color: #fc4646;
         border: none;
     }
-    .tips, .phone-calling {
+    .tips,
+    .phone-calling {
         width: 100%;
         height: 0.4rem;
         line-height: 0.4rem;
@@ -134,21 +155,21 @@ export default {
         .get-video-code {
             color: #656ff9;
         }
-    } 
+    }
     .msg-box-wrap {
         position: absolute;
         left: 0;
         bottom: 0;
         right: 0;
-        top: 0; 
-        background-color: rgba(0,0,0,0.4);
+        top: 0;
+        background-color: rgba(0, 0, 0, 0.4);
         .msg-box {
             position: absolute;
             left: 50%;
-            top: 50%; 
+            top: 50%;
             width: 5.4rem;
-            height: 3.2rem; 
-            transform: translate(-50%, -74%); 
+            height: 3.2rem;
+            transform: translate(-50%, -74%);
             background-color: #fff;
             border-radius: 0.08rem;
             padding-top: 0.3rem;
@@ -159,35 +180,36 @@ export default {
                 line-height: 0.74rem;
                 font-weight: bold;
                 text-align: center;
-            } 
+            }
             .content {
                 padding: 0 0.47rem 0.32rem 0.47rem;
                 text-align: center;
                 line-height: 0.48rem;
-                font-size: 0.28rem; 
+                font-size: 0.28rem;
                 border-bottom: 1px solid #E6E6E5;
             }
             .confirm {
                 height: 0.87rem;
                 font-size: 0;
-                .cancel, .ok {
+                .cancel,
+                .ok {
                     height: 100%;
                     display: inline-block;
                     width: 50%;
                     text-align: center;
                     line-height: 0.87rem;
                     color: #2c7de8;
-                    font-size: 0.3rem; 
+                    font-size: 0.3rem;
                 }
                 .cancel {
                     box-sizing: border-box;
-                    border-right: 1px solid #E6E6E5; 
+                    border-right: 1px solid #E6E6E5;
                 }
                 .ok {
                     font-weight: bold;
                 }
             }
-        } 
+        }
     }
 }
 
