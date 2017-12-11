@@ -3,54 +3,145 @@
         <div class="logo"></div>
         <div class="input-box">
             <p class="phone">
-                <input type="text" placeholder="请输入手机号码" autocomplete="off">
+                <input type="text" placeholder="请输入手机号码" autocomplete="off" v-model="phone">
             </p>
             <p class="code">
-                <input type="text" placeholder="请输入验证码" autocomplete="off">
-                <span class="get-code">获取验证码</span>
+                <input type="text" placeholder="请输入验证码" autocomplete="off" v-model="code">
+                <button class="get-code" @click="get_code" :disabled="get_code_disable" v-show="get_code_show">{{get_code_text}}</button>
             </p>
         </div>
         <button class="submit" @click="getMoney">确认收款</button>
-        <div class="tips">
-            <span>收不到短信？<i class="get-video-code">获取语音验证码</i></span>
+        <div class="tips" v-show="video_code_show_tit">
+            <span>收不到短信？<button class="get-video-code" @click="get_video_code_ways">{{get_video_code_text}}</button></span>
         </div>
-        <div class="phone-calling">
+        <div class="phone-calling" v-show="video_code_show">
             <p>电话拨打中...请留意来电</p>
-            <p><span>60</span>S后重试</p>
+            <p>{{video_code_text_count}}</p>
         </div>
-        <div class="msg-box-wrap" v-show="msgTipShow">
-            <div class="msg-box">
-                <h3 class="tit">接收短信验证码</h3>
-                <p class="content">验证码以短信形式通知你，请留意你的电话</p>
-                <p class="confirm">
-                    <span class="cancel">取消</span>
-                    <span class="ok">接收</span>
-                </p>
+        <transition name="fade">
+            <div class="msg-box-wrap" v-show="msgTipShow" @click.self="click_filter_cancel">
+                <div class="msg-box">
+                    <h3 class="tit">接收短信验证码</h3>
+                    <p class="content">验证码以电话形式通知您，请留意您的电话</p>
+                    <p class="confirm">
+                        <!-- <span class="cancel" @click.prevent.stop="cancel">取消</span> -->
+                        <span class="cancel" @click.self="cancel">取消</span>
+                        <span class="ok" @click="click_ok">接收</span>
+                    </p>
+                </div>
             </div>
-        </div>
-        <div v-kiko-loading.fullscreen="loadingFullscreen"></div> 
+        </transition>
+        <div v-kiko-loading.fullscreen="loadingFullscreen"></div>
     </div>
 </template>
 <script>
+import api from '@/api'
+import util from '@/common/js/util'
 export default {
     data() {
         return {
+            phone: '',
+            code: '',
             msgTipShow: false,
-            loadingFullscreen: false
+            loadingFullscreen: false,
+            get_code_show: true,
+            get_code_text: '获取验证码',
+            get_code_disable: false,
+
+            video_code_show: false,
+            video_code_show_tit: true,
+            video_code_text_count: '60S后重试',
+            get_video_code_text: '获取语音验证码',
+
         }
     },
     methods: {
-        getMoney() { 
-            this.$kiko_message('操作成功')
-            this.loadingFullscreen = true 
-            setTimeout(() => {
-                this.loadingFullscreen = false
-                this.loading = false
-            }, 2000)
+        getMoney() {
+            this.$message('操作成功!')
+            // this.loadingFullscreen = true 
+            // setTimeout(() => {
+            //     this.loadingFullscreen = false
+            //     this.loading = false
+            // }, 2000)
+            // this.msgTipShow = true
+
+            // if (this.phone == '') {
+            //     this.$message('手机不能为空')
+            // } 
+            // if (this.code == '') {
+            //     this.$message('邮箱不能为空')
+            // }
         },
-        confirmMakeSure() {
-            console.log('confirm')
+        cancel() {
+            this.msgTipShow = false
+        },
+        click_filter_cancel() {
+            this.msgTipShow = false
+        },
+        click_ok() {
+            // todu
+            console.log('开始请求语音验证码接口')
+            this.video_code_show = true
+            this.video_code_show_tit = false
+            this.count_down_video()
+            this.msgTipShow = false
+        },
+        // 获取短信验证码
+        get_code() {
+            // todu
+            console.log('开始请求获取验证码接口接口')
+            this.get_code_text = '60S'
+            this.get_code_disable = true
+            this.count_down()
+        },
+        // 短信验证码倒计时函数  
+        count_down() {
+            let timer = null
+            let count = 60
+            timer = setInterval(() => {
+                count--
+                this.get_code_text = count + 'S'
+                if (count == 0) {
+                    clearInterval(timer)
+                    this.get_code_text = '再次获取验证码'
+                    this.get_code_disable = false
+                }
+            }, 1000)
+        },
+        // 语音验证码倒计时函数
+        count_down_video() {
+            let timer = null
+            let count = 60
+            timer = setInterval(() => {
+                count--
+                this.video_code_text_count = count + 'S后重试'
+                if (count == 0) {
+                    clearInterval(timer)
+                    this.get_video_code_text = '再次获取语音验证码'
+                    this.video_code_text_count = '60S后重试'
+                    this.video_code_show_tit = true
+                    this.video_code_show = false
+                }
+            }, 1000)
+        },
+        // 获取语音验证码
+        get_video_code_ways() {
+            this.msgTipShow = true
+        },
+        // 加载页面信息，获取订单号和微信昵称
+        load_payment_page() {
+            let wechatCode = this.$route.query.code,
+                payToken = this.$route.query.payToken
+            api.load_payment_page({ system: '2bapp_wechat_pay_h5', payToken: payToken, wechatCode: wechatCode }).then((res) => {
+                console.log(res)
+                if (res._data._ret != '0') {
+                    this.$message(res._data._errStr)
+                }
+            })
         }
+    },
+    mounted() {
+        this.load_payment_page()
     }
 
 }
@@ -58,7 +149,18 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-// @import '../common/css/mixin'; 
+@import '../common/css/mixin';
+// 全局运动fade
+.fade-enter-active,
+.fade-leave-active {
+    transition: all .5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
 .home-wrap {
     width: 7.5rem;
     height: 100%;
@@ -84,9 +186,11 @@ export default {
         .code {
             height: 1.2rem;
             line-height: 1.2rem;
-            padding: 0 2rem 0 0.66rem;
+            padding: 0 2.5rem 0 0.66rem;
             box-sizing: border-box;
-            background: url(../common/img/ico_mobile.png) 0.24rem 0.38rem no-repeat;
+            @include bg-image('../common/img/ico_mobile');
+            background-repeat: no-repeat;
+            background-position: 0.24rem 0.38rem;
             background-size: 0.32rem 0.44rem;
             input {
                 height: 100%;
@@ -95,6 +199,7 @@ export default {
                 font-size: 0.3rem;
                 box-sizing: border-box;
                 color: #666;
+                vertical-align: top;
             }
              ::-webkit-input-placeholder {
                 color: #ccc;
@@ -118,19 +223,23 @@ export default {
             ;
         }
         .code {
-            background: url(../common/img/ico_suo.png) 0.24rem 0.38rem no-repeat;
+            @include bg-image('../common/img/ico_suo');
+            background-repeat: no-repeat;
+            background-position: 0.24rem 0.38rem;
             background-size: 0.32rem 0.40rem;
             border-top: 1px solid #f3f3f3;
             position: relative;
             .get-code {
-                font-size: 0.28rem;
-                color: #666;
+                font-size: 0.28rem; // color: #666;
+                color: #656FF9;
                 position: absolute;
                 right: 0.24rem;
                 top: 0.4rem;
                 height: 0.4rem;
                 line-height: 0.4rem;
                 display: inline;
+                background: transparent;
+                border: none;
             }
         }
     }
@@ -152,8 +261,12 @@ export default {
         line-height: 0.4rem;
         text-align: center;
         color: #666;
+        font-size: 0.24rem;
         .get-video-code {
             color: #656ff9;
+            background: transparent;
+            border: none;
+            font-size: 0.24rem;
         }
     }
     .msg-box-wrap {
@@ -204,9 +317,6 @@ export default {
                 .cancel {
                     box-sizing: border-box;
                     border-right: 1px solid #E6E6E5;
-                }
-                .ok {
-                    font-weight: bold;
                 }
             }
         }

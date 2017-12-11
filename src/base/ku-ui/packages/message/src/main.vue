@@ -12,7 +12,7 @@
     data () {
       return {
         message: '',
-        time: 3000,
+        time: 2000,
         isShow: true
       }
     },
@@ -33,14 +33,15 @@
 <style type="text/css" scoped>
   .kiko-message {
     position: fixed;
-    padding: 10px;
+    padding: 0.1rem;
     color: #fff;
     background-color: #5F6161;
-    border-radius: 4px;
+    border-radius: 0.04rem;
     top:50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 999999999
+    z-index: 999999999;
+    font-size: 0.26rem;
   }
   .fade-enter-active, .fade-leave-active {
     transition: opacity .5s

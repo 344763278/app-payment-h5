@@ -5,9 +5,11 @@ import App from './App'
 import router from './router'
 import '@/common/css/reset.css'
 import '@/common/css/font-awesome.css'
+import axios from 'axios'
 import kuUi from '@/base/ku-ui'
-Vue.use(kuUi) 
+Vue.use(kuUi)  
 
+Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

@@ -5,12 +5,23 @@
 const path = require('path')
 
 module.exports = {
-  dev: {
+  dev: { 
 
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+        '/api': { 
+            // target: 'http://10.0.10.202:9999', // 你接口的域名 
+            target: 'http://www.happymmall.com/', // 你接口的域名 
+            // 必须要填写，否则易出错
+            pathRewrite: {
+                '^/api': ''
+            },
+            secure: false,      // 如果是https接口，需要配置这个参数
+            changeOrigin: true,     // 如果接口跨域，需要进行这个参数配置
+        }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
