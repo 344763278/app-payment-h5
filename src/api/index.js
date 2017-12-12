@@ -45,7 +45,7 @@ export function jsonp(_interface, params) {
 
 export default {
     load_payment_page(params) { return jsonp('order-2bapp_load_payment_page', params) },                //加载微信回调url信息接口
-    pay_get_verifi_code(params) { return jsonp('ordder-2bapp_pay_get_verifi_code', params) },           //请求短信或语音验证码接口 
+    pay_get_verifi_code(params) { return jsonp('order-2bapp_pay_get_verifi_code', params) },           //请求短信或语音验证码接口 
     get_qrcode_payaccount(params) { return jsonp('order-2bapp_get_qrcode_payaccount', params) },        //获取二维码收款账号接口
     collect_money(params) { return jsonp('order-2bapp_collect_money', params) },                        //订单预付款接口
     notify(params) { return jsonp('order-order_notify', params) },                                      //付款后，第三方事件通知接口 

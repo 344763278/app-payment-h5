@@ -44,10 +44,11 @@ export default {
             code: '',
             msgTipShow: false,
             loadingFullscreen: false,
+            // 短信验证码相关
             get_code_show: true,
             get_code_text: '获取验证码',
             get_code_disable: false,
-
+            // 语音验证码相关
             video_code_show: false,
             video_code_show_tit: true,
             video_code_text_count: '60S后重试',
@@ -75,7 +76,7 @@ export default {
                 this.$message('请输入6位验证码')
                 return
             }
-            this.loadingFullscreen = true 
+            this.loadingFullscreen = true
             console.log('开始请求付款接口')
             let data = {
                 system: '2bapp_wechat_pay_h5',
@@ -97,7 +98,7 @@ export default {
                 return Promise.resolve()
             }).then((res) => {
                 let params = {
-                    system: 'delegate_app/2bapp_wechat_pay_h5',
+                    system: '2bapp_wechat_pay_h5',
                     appusetype: '',
                     uid: '',
                     login_token: '',
@@ -105,29 +106,32 @@ export default {
                     accountType: this.accountType,
                     account: this.wechatOpenId,
                     newAccountFlag: this.newAccountFlag,
-                    payToken: this.payToken
+                    payToken: this.payToken,
+                    wechatCode: this.wechatCode
                 }
                 //订单预付款 + 事件通知
                 api.collect_money(params).then((res) => {
                     if (res.body.ret == 1 && res.body.retcode == 'OC2B00011046') {
                         this.$message(res.body.retinfo)
-                        this.eventNotice('errorTimeout') 
+                        this.eventNotice('errorTimeout')
+                        this.loadingFullscreen = false
                         return
                     }
                     if (res.body.ret == 1 && res.body.retcode != 'OC2B00011046') {
                         this.$message(res.body.retinfo)
                         this.eventNotice('error')
+                        this.loadingFullscreen = false
                         return
                     }
                     if (res.body.ret == '0') {
-                        eventNotice('success')
+                        this.eventNotice('success')
                         // 付款成功提示跳转页面
                         this.$router.push({ path: '/successTip' })
                     }
-                    this.loadingFullscreen = false
+                    
 
                 })
-            }, (res) => { console.log(res) })    
+            }, (res) => { console.log(res) })
         },
         cancel() {
             this.msgTipShow = false
@@ -198,11 +202,16 @@ export default {
         },
         // 加载页面信息，获取订单号和微信昵称
         load_payment_page() {
-            let wechatCode = this.$route.query.code || '1212',
-                payToken = this.$route.query.payToken || '34343'
+            let wechatCode = this.$route.query.code || '0135LN3H0wQU3l2i3U1H0XTE3H05LN3h',
+                payToken = this.$route.query.payToken || 'a2364e2a817d00875e0737efbbc9a99a'
             this.payToken = payToken
-            this.wechatCode = this.wechatCode
-            api.load_payment_page({ system: '2bapp_wechat_pay_h5', payToken: payToken, wechatCode: wechatCode }).then((res) => {
+            this.wechatCode = wechatCode
+            let params = {
+                system: '2bapp_wechat_pay_h5',
+                payToken: payToken,
+                wechatCode: wechatCode
+            }
+            api.load_payment_page(params).then((res) => {
                 console.log(res)
                 if (res.body.ret != '0') {
                     this.$message(res.body.retinfo)
