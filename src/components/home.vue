@@ -53,24 +53,81 @@ export default {
             video_code_text_count: '60S后重试',
             get_video_code_text: '获取语音验证码',
 
+            // 接口参数
+            payToken: '',
+            wechatCode: '',
+            orderId: '',
+            accountType: '',
+            wechatOpenId: '',
+            newAccountFlag: '',
+            subEventId: ''
+
+
         }
     },
     methods: {
         getMoney() {
-            this.$message('操作成功!')
-            // this.loadingFullscreen = true 
-            // setTimeout(() => {
-            //     this.loadingFullscreen = false
-            //     this.loading = false
-            // }, 2000)
-            // this.msgTipShow = true
+            if (!/^1[3|4|5|7|8]\d{9}$/.test(this.phone)) {
+                this.$message('请输入正确手机号')
+                return
+            }
+            if (!/^\d{6}$/.test(this.code)) {
+                this.$message('请输入6位验证码')
+                return
+            }
+            this.loadingFullscreen = true 
+            console.log('开始请求付款接口')
+            let data = {
+                system: '2bapp_wechat_pay_h5',
+                payToken: this.payToken,
+                wechatCode: this.wechatCode,
+                userTel: this.phone,
+                telCode: this.code
+            }
+            //获取二维码收款账号
+            api.get_qrcode_payaccount(data).then((res) => {
+                if (res.body.ret != '0') {
+                    this.$message(res.body.retinfo)
+                    this.loadingFullscreen = false
+                    return Promise.reject(res.body.retinfo)
+                }
+                this.accountType = res.body.data.accountType
+                this.wechatOpenId = res.body.data.wechatOpenId
+                this.newAccountFlag = res.body.data.newAccountFlag
+                return Promise.resolve()
+            }).then((res) => {
+                let params = {
+                    system: 'delegate_app/2bapp_wechat_pay_h5',
+                    appusetype: '',
+                    uid: '',
+                    login_token: '',
+                    orderId: this.orderId,
+                    accountType: this.accountType,
+                    account: this.wechatOpenId,
+                    newAccountFlag: this.newAccountFlag,
+                    payToken: this.payToken
+                }
+                //订单预付款 + 事件通知
+                api.collect_money(params).then((res) => {
+                    if (res.body.ret == 1 && res.body.retcode == 'OC2B00011046') {
+                        this.$message(res.body.retinfo)
+                        this.eventNotice('errorTimeout') 
+                        return
+                    }
+                    if (res.body.ret == 1 && res.body.retcode != 'OC2B00011046') {
+                        this.$message(res.body.retinfo)
+                        this.eventNotice('error')
+                        return
+                    }
+                    if (res.body.ret == '0') {
+                        eventNotice('success')
+                        // 付款成功提示跳转页面
+                        this.$router.push({ path: '/successTip' })
+                    }
+                    this.loadingFullscreen = false
 
-            // if (this.phone == '') {
-            //     this.$message('手机不能为空')
-            // } 
-            // if (this.code == '') {
-            //     this.$message('邮箱不能为空')
-            // }
+                })
+            }, (res) => { console.log(res) })    
         },
         cancel() {
             this.msgTipShow = false
@@ -78,21 +135,18 @@ export default {
         click_filter_cancel() {
             this.msgTipShow = false
         },
-        click_ok() {
-            // todu
-            console.log('开始请求语音验证码接口')
-            this.video_code_show = true
-            this.video_code_show_tit = false
-            this.count_down_video()
-            this.msgTipShow = false
-        },
         // 获取短信验证码
         get_code() {
             // todu
-            console.log('开始请求获取验证码接口接口')
+            if (!/^1[3|4|5|7|8]\d{9}$/.test(this.phone)) {
+                this.$message('请输入正确手机号')
+                return
+            }
             this.get_code_text = '60S'
             this.get_code_disable = true
             this.count_down()
+            console.log('开始请求短信验证码接口')
+            this.get_code_interface('1')
         },
         // 短信验证码倒计时函数  
         count_down() {
@@ -126,17 +180,86 @@ export default {
         },
         // 获取语音验证码
         get_video_code_ways() {
+            if (!/^1[3|4|5|7|8]\d{9}$/.test(this.phone)) {
+                this.$message('请输入正确手机号')
+                return
+            }
             this.msgTipShow = true
+        },
+        //获取语音验证码，并点击接收按钮
+        click_ok() {
+            // todu  
+            this.video_code_show = true
+            this.video_code_show_tit = false
+            this.msgTipShow = false
+            this.count_down_video()
+            console.log('开始请求语音验证码接口')
+            this.get_code_interface('2')
         },
         // 加载页面信息，获取订单号和微信昵称
         load_payment_page() {
-            let wechatCode = this.$route.query.code,
-                payToken = this.$route.query.payToken
+            let wechatCode = this.$route.query.code || '1212',
+                payToken = this.$route.query.payToken || '34343'
+            this.payToken = payToken
+            this.wechatCode = this.wechatCode
             api.load_payment_page({ system: '2bapp_wechat_pay_h5', payToken: payToken, wechatCode: wechatCode }).then((res) => {
                 console.log(res)
-                if (res._data._ret != '0') {
-                    this.$message(res._data._errStr)
+                if (res.body.ret != '0') {
+                    this.$message(res.body.retinfo)
+                    return
                 }
+                this.orderId = res.body.data.orderId
+
+            })
+        },
+        // 请求验证码接口封装
+        get_code_interface(type) {
+            let flag = ''
+            if (type == '1') {
+                flag = '1' //手机短信
+            }
+            if (type == '2') {
+                flag = '2' //语音短信
+            }
+            let data = {
+                system: '2bapp_wechat_pay_h5',
+                payToken: this.payToken,
+                wechatCode: this.wechatCode,
+                userTel: this.phone,
+                verifiType: flag
+            }
+            //这接口只接收验证码，其他数据不返回
+            api.pay_get_verifi_code(data).then((res) => {
+                if (res.body.ret != '0') {
+                    this.$message(res.body.retinfo)
+                    return
+                }
+            })
+        },
+        // 第三方事件通知
+        eventNotice(flag) {
+            if (flag == 'success') {
+                this.subEventId = '0';
+            }
+
+            if (flag == 'error') {
+                this.subEventId = '2';
+            }
+
+            if (flag == 'errorTimeout') {
+                this.subEventId = '1';
+            }
+            let params = {
+                system: '',
+                orderType: '2B',
+                appUseType: '',
+                uid: '',
+                login_token: '',
+                orderId: this.orderId,
+                subEventId: this.subEventId
+            }
+            api.notify(params).then((res) => {
+                console.log(res)
             })
         }
     },

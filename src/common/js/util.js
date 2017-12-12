@@ -4,8 +4,7 @@
 export default {
     //配置参数
     //配置参数
-    jsonpUrl: process.env.NODE_ENV == 'development' ? 'https://dev-access.huanjixia.com/index/index' : '', //jsonp开发环境、线上环境
-    api: process.env.NODE_ENV == 'development' ? '/pengkuan' : '',
+    jsonpUrl: process.env.NODE_ENV == 'development' ? 'https://dev-app.huanjixia.com/api/appstore' : '', //jsonp开发环境、线上环境 
     // 公共方法
     // 公共方法
     getQueryStringByName: function(name) {

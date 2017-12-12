@@ -47,5 +47,8 @@ import '@/common/css/font-awesome.css'
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 9999999999999;
+    i::before{
+      font-size: 0.12rem;
+    }
   }
 </style>
