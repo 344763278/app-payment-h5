@@ -96,7 +96,7 @@ export default {
                 this.wechatOpenId = res.body.data.wechatOpenId
                 this.newAccountFlag = res.body.data.newAccountFlag
                 return Promise.resolve()
-            }).then((res) => {
+            },(error)=>{console.log(error)}).then((res) => {
                 let params = {
                     system: '2bapp_wechat_pay_h5',
                     appusetype: '',
@@ -131,7 +131,7 @@ export default {
                     
 
                 })
-            }, (res) => { console.log(res) })
+            }, (error) => { console.log(error) })
         },
         cancel() {
             this.msgTipShow = false

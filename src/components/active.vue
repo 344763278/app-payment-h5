@@ -1,5 +1,5 @@
 <template>
-	<div class="success-tip-wrap">
+	<div class="active-wrap">
 		<h2 class="tit">
 			收款结果
 		</h2>
@@ -13,13 +13,19 @@
 			请在微信中查看：我 - 钱包 - 零钱
 		</div> 
 		<div class="line"></div>
-		<div class="pic">
-			<img src="../common/img/pic.png" alt="pic">
+		<div class="pic">  
+			<div class="active-text">
+				<div class="text-line"></div>
+				<span class="text">活动</span>
+			</div>
+			<div class="active-url">
+				<img src="../common/img/active-url.png" alt="url">
+			</div>  
 		</div>
 	</div>
 </template>
 <style scoped lang="scss">
-	.success-tip-wrap {
+	.active-wrap {
 		width: 100%;
 		height: 100%;
 		background: #fff;
@@ -58,9 +64,38 @@
 		.pic {
 			width: 7.5rem;
 			height: 6.5rem;
-			img {
+			.active-text { 
 				width: 100%;
-				height: 100%;
+				height: 1rem; 
+				position: relative;
+				.text-line {
+					position: absolute;
+					width: 4.06rem;
+					height: 1px;
+					left: 50%;
+					top: 50%;
+					transform: translate(-50%,-50%);
+					background: #E5E5E5;
+				}
+				.text {
+					position: absolute;
+					width: 0.86rem;
+					height: 0.24rem;
+					left: 50%;
+					top: 50%;
+					transform: translate(-50%,-50%);
+					font-size: 0.24rem;
+					line-height: 0.24rem;
+					background: #fff;
+					color: #ccc;
+				}
+			}
+			.active-url {
+				height: 3.6rem; 
+				img {
+					width: 6.54rem;
+					height: 3.6rem;
+				}
 			}
 		}
 	}

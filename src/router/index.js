@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import home from '@/components/home'
 import successTip from '@/components/successTip'
-import errorTip from '@/components/errorTip'
+import active from '@/components/active'
 
 Vue.use(Router)
 
@@ -21,9 +21,9 @@ export default new Router({
             name: 'successTip',
             component: successTip
         }, {
-            path: '/errorTip',
-            name: 'errorTip',
-            component: errorTip
+            path: '/active',
+            name: 'active',
+            component: active
         }
     ]
 })
