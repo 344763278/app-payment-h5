@@ -24,7 +24,6 @@
                     <h3 class="tit">接收短信验证码</h3>
                     <p class="content">验证码以电话形式通知您，请留意您的电话</p>
                     <p class="confirm">
-                        <!-- <span class="cancel" @click.prevent.stop="cancel">取消</span> -->
                         <span class="cancel" @click.self="cancel">取消</span>
                         <span class="ok" @click="click_ok">接收</span>
                     </p>
@@ -96,7 +95,7 @@ export default {
                 this.wechatOpenId = res.body.data.wechatOpenId
                 this.newAccountFlag = res.body.data.newAccountFlag
                 return Promise.resolve()
-            },(error)=>{console.log(error)}).then((res) => {
+            }, (error) => { console.log(error) }).then((res) => {
                 let params = {
                     system: '2bapp_wechat_pay_h5',
                     appusetype: '',
@@ -125,10 +124,11 @@ export default {
                     }
                     if (res.body.ret == '0') {
                         this.eventNotice('success')
+                        this.loadingFullscreen = false
                         // 付款成功提示跳转页面
                         this.$router.push({ path: '/successTip' })
                     }
-                    
+
 
                 })
             }, (error) => { console.log(error) })
@@ -141,15 +141,10 @@ export default {
         },
         // 获取短信验证码
         get_code() {
-            // todu
             if (!/^1[3|4|5|7|8]\d{9}$/.test(this.phone)) {
                 this.$message('请输入正确手机号')
                 return
             }
-            this.get_code_text = '60S'
-            this.get_code_disable = true
-            this.count_down()
-            console.log('开始请求短信验证码接口')
             this.get_code_interface('1')
         },
         // 短信验证码倒计时函数  
@@ -192,18 +187,18 @@ export default {
         },
         //获取语音验证码，并点击接收按钮
         click_ok() {
-            // todu  
-            this.video_code_show = true
-            this.video_code_show_tit = false
             this.msgTipShow = false
-            this.count_down_video()
-            console.log('开始请求语音验证码接口')
             this.get_code_interface('2')
         },
         // 加载页面信息，获取订单号和微信昵称
         load_payment_page() {
-            let wechatCode = this.$route.query.code || '0135LN3H0wQU3l2i3U1H0XTE3H05LN3h',
-                payToken = this.$route.query.payToken || 'a2364e2a817d00875e0737efbbc9a99a'
+            let wechatCode = this.$route.query.code || '',
+                payToken = this.$route.query.payToken || ''
+            // 开发环境调试，code和token写死
+            if (process.env.NODE_ENV != 'production') {
+                wechatCode = '013cHTRe0fmuXA1IIMQe0h7VRe0cHTR6'
+                payToken = '20f517fc346df8b25bf0681d464a404d'
+            }
             this.payToken = payToken
             this.wechatCode = wechatCode
             let params = {
@@ -242,6 +237,17 @@ export default {
                 if (res.body.ret != '0') {
                     this.$message(res.body.retinfo)
                     return
+                }
+                // 接口请求回来再倒计时，同一类型接口55秒重复点是会报错的
+                // 接口请求成功事件和收到短信的时间不一样
+                if (type == '1') {
+                    this.get_code_text = '60S'
+                    this.get_code_disable = true
+                    this.count_down()
+                } else if (type == '2') {
+                    this.video_code_show = true
+                    this.video_code_show_tit = false
+                    this.count_down_video()
                 }
             })
         },
@@ -318,7 +324,7 @@ export default {
         .code {
             height: 1.2rem;
             line-height: 1.2rem;
-            padding: 0 2.5rem 0 0.66rem;
+            padding: 0 2.5rem 0 0.76rem;
             box-sizing: border-box;
             @include bg-image('../common/img/ico_mobile');
             background-repeat: no-repeat;
