@@ -192,9 +192,10 @@ export default {
         },
         // 加载页面信息，获取订单号和微信昵称
         load_payment_page() {
-            let wechatCode = this.$route.query.code || '',
-                payToken = this.$route.query.payToken || ''
+            let wechatCode = util.getUrlParam('code') || '',
+                payToken = util.getUrlParam('payToken') || ''
             // 开发环境调试，code和token写死
+            console.log(`wechatCode是${wechatCode}\n`,`payToken是${payToken}`)
             if (process.env.NODE_ENV != 'production') {
                 wechatCode = '013cHTRe0fmuXA1IIMQe0h7VRe0cHTR6'
                 payToken = '20f517fc346df8b25bf0681d464a404d'
@@ -323,7 +324,7 @@ export default {
         .phone,
         .code {
             height: 1.2rem;
-            line-height: 1.2rem;
+            line-height: 1.2rem; 
             padding: 0 2.5rem 0 0.76rem;
             box-sizing: border-box;
             @include bg-image('../common/img/ico_mobile');
@@ -332,7 +333,8 @@ export default {
             background-size: 0.32rem 0.44rem;
             input {
                 height: 100%;
-                line-height: 1.2rem;
+                // 兼容iphone，将行号设置为何字体大小一致
+                line-height: 0.3rem;
                 width: 100%;
                 font-size: 0.3rem;
                 box-sizing: border-box;

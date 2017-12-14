@@ -12,21 +12,21 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
         '/api': { 
-            // target: 'http://10.0.10.202:9999', // 你接口的域名 
-            // target: 'http://www.happymmall.com/', // 你接口的域名 
-            // 必须要填写，否则易出错
+            // target: 'http://10.0.10.202:9999',           // 你接口的域名 
+            // target: 'http://www.happymmall.com/',        // 你接口的域名 
+            // 必须要填写，且为空，否则易出错
             pathRewrite: {
                 '^/api': ''
             },
-            secure: false,      // 如果是https接口，需要配置这个参数
-            changeOrigin: true,     // 如果接口跨域，需要进行这个参数配置
+            secure: false,                                  // 如果是https接口，需要配置这个参数
+            changeOrigin: true,                             // 如果接口跨域，需要进行这个参数配置
         }
     },
 
     // Various Dev Server settings
-    host: 'localhost', // can be overwritten by process.env.HOST
+    host: '10.0.10.216', // can be overwritten by process.env.HOST
     port: 7070, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
-    autoOpenBrowser: false,
+    autoOpenBrowser: true,
     errorOverlay: true,
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
@@ -56,7 +56,7 @@ module.exports = {
     // (https://github.com/webpack/css-loader#sourcemaps)
     // In our experience, they generally work as expected,
     // just be aware of this issue when enabling this option.
-    cssSourceMap: false,
+    cssSourceMap: true,
   },
 
   build: {
