@@ -23,7 +23,7 @@ exports.cssLoaders = function (options) {
   }
 
   const postcssLoader = {
-    loader: 'postcss-loader',
+    loader: 'postcss-loader', 
     options: {
       sourceMap: options.sourceMap
     }
@@ -47,6 +47,8 @@ exports.cssLoaders = function (options) {
     if (options.extract) {
       return ExtractTextPlugin.extract({
         use: loaders,
+        //css如果加了背景图片，需加以下配置
+        publicPath: '../../', 
         fallback: 'vue-style-loader'
       })
     } else {

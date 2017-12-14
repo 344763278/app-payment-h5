@@ -6,8 +6,7 @@ import active from '@/components/active'
 
 Vue.use(Router)
 
-export default new Router({
-    mode: 'history',
+export default new Router({ 
     routes: [{
             path: '/',
             redirect: '/home',
