@@ -6,13 +6,13 @@
                 <input type="text" placeholder="请输入手机号码" autocomplete="off" v-model="phone">
             </p>
             <p class="code">
-                <input type="text" placeholder="请输入验证码" autocomplete="off" v-model="code">
+                <input type="text" placeholder="请输入验证码" autocomplete="off" v-model="code" @focus="code_focus">
                 <button class="get-code" @click="get_code" :disabled="get_code_disable" v-show="get_code_show">{{get_code_text}}</button>
             </p>
         </div>
         <button class="submit" @click="getMoney">确认收款</button>
         <div class="tips" v-show="video_code_show_tit">
-            <span>收不到短信？<button class="get-video-code" @click="get_video_code_ways">{{get_video_code_text}}</button></span>
+            <span>收不到短信?<button class="get-video-code" @click="get_video_code_ways">{{get_video_code_text}}</button></span>
         </div>
         <div class="phone-calling" v-show="video_code_show">
             <p>电话拨打中...请留意来电</p>
@@ -21,7 +21,7 @@
         <transition name="fade">
             <div class="msg-box-wrap" v-show="msgTipShow" @click.self="click_filter_cancel">
                 <div class="msg-box">
-                    <h3 class="tit">接收短信验证码</h3>
+                    <h3 class="tit">接收语音验证码</h3>
                     <p class="content">验证码以电话形式通知您，请留意您的电话</p>
                     <p class="confirm">
                         <span class="cancel" @click.self="cancel">取消</span>
@@ -67,6 +67,10 @@ export default {
     },
     methods: {
         getMoney() {
+
+            this.$router.push({ path: '/successTip' })
+            return
+             
             if (!/^1[3|4|5|7|8]\d{9}$/.test(this.phone)) {
                 this.$message('请输入正确手机号')
                 return
@@ -76,6 +80,20 @@ export default {
                 return
             }
             this.loadingFullscreen = true
+
+            // new Promise((resolve, reject) => {
+            //     function fn() {
+            //         setTimeout(function() {
+            //             console.log(1)
+            //         }, 0)
+            //     }
+            //     // return resolve(this.loadingFullscreen = false,console.log(1))
+            //     return resolve(fn())
+            // }).then(() => {
+            //     this.$router.push({ path: '/successTip' })
+            //     console.log(2)
+            // })
+
             console.log('开始请求付款接口')
             let data = {
                 system: '2bapp_wechat_pay_h5',
@@ -124,9 +142,14 @@ export default {
                     }
                     if (res.body.ret == '0') {
                         this.eventNotice('success')
-                        this.loadingFullscreen = false
-                        // 付款成功提示跳转页面
-                        this.$router.push({ path: '/successTip' })
+                        // 付款成功提示跳转页面 
+                        // loading是异步 ？？？
+                        let p = new Promise((resolve, reject) => {
+                            return resolve(this.loadingFullscreen = false)
+                        })
+                        p.then(() => {
+                            this.$router.push({ path: '/successTip' })
+                        })
                     }
 
 
@@ -195,7 +218,7 @@ export default {
             let wechatCode = util.getUrlParam('code') || '',
                 payToken = util.getUrlParam('payToken') || ''
             // 开发环境调试，code和token写死
-            console.log(`wechatCode是${wechatCode}\n`,`payToken是${payToken}`)
+            console.log(`wechatCode是${wechatCode}\n`, `payToken是${payToken}`)
             if (process.env.NODE_ENV != 'production') {
                 wechatCode = '013cHTRe0fmuXA1IIMQe0h7VRe0cHTR6'
                 payToken = '20f517fc346df8b25bf0681d464a404d'
@@ -277,6 +300,16 @@ export default {
             api.notify(params).then((res) => {
                 console.log(res)
             })
+        },
+        code_focus() {
+            // 调试用
+            if (process.env.NODE_ENV != 'production') {
+                console.log('验证码获得了焦点')
+                let body_h = document.body.clientHeight
+                let window_h = window.screen.height
+                console.log(body_h, window_h)
+                document.body.height = window_h + 'px'
+            }
         }
     },
     mounted() {
@@ -324,16 +357,15 @@ export default {
         .phone,
         .code {
             height: 1.2rem;
-            line-height: 1.2rem; 
-            padding: 0 2.5rem 0 0.76rem;
+            line-height: 1.2rem;
+            padding: 0 2.5rem 0 0.70rem;
             box-sizing: border-box;
             @include bg-image('../common/img/ico_mobile');
             background-repeat: no-repeat;
             background-position: 0.24rem 0.38rem;
             background-size: 0.32rem 0.44rem;
             input {
-                height: 100%;
-                // 兼容iphone，将行号设置为何字体大小一致
+                height: 100%; // 兼容iphone，将行号设置为何字体大小一致
                 line-height: 0.3rem;
                 width: 100%;
                 font-size: 0.3rem;
@@ -341,26 +373,34 @@ export default {
                 color: #666;
                 vertical-align: top;
             }
-             ::-webkit-input-placeholder {
+            ::-webkit-input-placeholder {
                 color: #ccc;
                 font-family: 'PingFang-SC-Medium';
+                font-size: 0.3rem;
+                font-weight: normal; 
+                padding-top: 0.04rem;
             }
-            ;
-             :-moz-placeholder {
+            :-moz-placeholder {
                 color: #ccc;
                 font-family: 'PingFang-SC-Medium';
+                font-size: 0.3rem;
+                font-weight: normal; 
+                padding-top: 0.04rem;
             }
-            ;
-             ::-moz-placeholder {
+            ::-moz-placeholder {
                 color: #ccc;
                 font-family: 'PingFang-SC-Medium';
+                font-size: 0.3rem;
+                font-weight: normal; 
+                padding-top: 0.04rem;
             }
-            ;
-             :-ms-input-placeholder {
+            :-ms-input-placeholder {
                 color: #ccc;
                 font-family: 'PingFang-SC-Medium';
+                font-size: 0.3rem;
+                font-weight: normal; 
+                padding-top: 0.04rem;
             }
-            ;
         }
         .code {
             @include bg-image('../common/img/ico_suo');
@@ -370,23 +410,24 @@ export default {
             border-top: 1px solid #f3f3f3;
             position: relative;
             .get-code {
-                font-size: 0.28rem; // color: #666;
-                color: #656FF9;
+                font-size: 0.28rem; 
+                color: #666;
                 position: absolute;
-                right: 0.24rem;
+                right: 0.2rem;
                 top: 0.4rem;
                 height: 0.4rem;
                 line-height: 0.4rem;
                 display: inline;
                 background: transparent;
                 border: none;
+                padding:0;
             }
         }
     }
     .submit {
         width: 6.54rem;
         height: 0.8rem;
-        margin: 0.4rem auto;
+        margin: 0.4rem auto 0.25rem auto;
         display: block;
         border-radius: 0.08rem;
         font-size: 0.36rem;
@@ -398,7 +439,7 @@ export default {
     .phone-calling {
         width: 100%;
         height: 0.4rem;
-        line-height: 0.4rem;
+        line-height: 0.4rem; 
         text-align: center;
         color: #666;
         font-size: 0.24rem;
@@ -407,8 +448,9 @@ export default {
             background: transparent;
             border: none;
             font-size: 0.24rem;
+            padding: 0 0.05rem;
         }
-    }
+    } 
     .msg-box-wrap {
         position: absolute;
         left: 0;
@@ -440,6 +482,7 @@ export default {
                 line-height: 0.48rem;
                 font-size: 0.28rem;
                 border-bottom: 1px solid #E6E6E5;
+                color: #333;
             }
             .confirm {
                 height: 0.87rem;
@@ -457,6 +500,11 @@ export default {
                 .cancel {
                     box-sizing: border-box;
                     border-right: 1px solid #E6E6E5;
+                }
+                ,
+                .ok {
+                    font-family: 'PingFang-SC-Bold';
+                    font-weight: bold;
                 }
             }
         }

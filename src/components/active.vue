@@ -1,8 +1,8 @@
 <template>
 	<div class="active-wrap">
-		<h2 class="tit">
+		<!-- <h2 class="tit">
 			收款结果
-		</h2>
+		</h2> -->
 		<div class="pic-money">
 			<img src="../common/img/pic__money.png" alt="pic_money">
 		</div>

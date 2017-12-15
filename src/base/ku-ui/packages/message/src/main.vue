@@ -33,6 +33,7 @@
 <style type="text/css" scoped>
   .kiko-message {
     position: fixed;
+    min-width: 2rem;
     padding: 0.1rem;
     color: #fff;
     background-color: #5F6161;
@@ -42,6 +43,8 @@
     transform: translate(-50%, -50%);
     z-index: 999999999;
     font-size: 0.26rem;
+    text-align: center;
+
   }
   .fade-enter-active, .fade-leave-active {
     transition: opacity .5s
