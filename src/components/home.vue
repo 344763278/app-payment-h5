@@ -33,7 +33,7 @@
             </transition>
             <div v-kiko-loading.fullscreen="loadingFullscreen"></div>
         </div>
-        <div class="success-tip-wrap" v-show="success_page_show"> 
+        <div class="success-tip-wrap" v-show="success_page_show">
             <div class="pic-money">
                 <img src="../common/img/pic__money.png" alt="pic_money">
             </div>
@@ -42,13 +42,13 @@
             </div>
             <div class="desc">
                 请在微信中查看：我-钱包-零钱
-            </div> 
+            </div>
             <div class="line"></div>
             <div class="pic">
                 <img src="../common/img/pic.png" alt="pic">
             </div>
         </div>
-        <div class="active-wrap" v-show="active_page_show"> 
+        <div class="active-wrap" v-show="active_page_show">
             <div class="pic-money">
                 <img src="../common/img/pic__money.png" alt="pic_money">
             </div>
@@ -57,19 +57,19 @@
             </div>
             <div class="desc">
                 请在微信中查看：我-钱包-零钱
-            </div> 
+            </div>
             <div class="line"></div>
-            <div class="pic-active">  
+            <div class="pic-active">
                 <div class="active-text">
                     <div class="text-line"></div>
                     <span class="text">活动</span>
                 </div>
                 <div class="active-url">
                     <img src="../common/img/active-url.png" alt="url">
-                </div>  
+                </div>
             </div>
         </div>
-    </div> 
+    </div>
 </template>
 <script>
 import api from '@/api'
@@ -103,13 +103,17 @@ export default {
             // 控制主页面的显示隐藏，改为类单页
             success_page_show: false,
             home_page_show: true,
-            active_page_show: false
+            active_page_show: false,
+
+            // 处理软键盘兼容问题
+            window_h: 0,
+            curr_h: 0
 
         }
     },
     methods: {
-        getMoney() {   
-             
+        getMoney() {
+
             if (!/^1[3|4|5|7|8]\d{9}$/.test(this.phone)) {
                 this.$message('请输入正确手机号')
                 return
@@ -118,7 +122,7 @@ export default {
                 this.$message('请输入6位验证码')
                 return
             }
-            this.loadingFullscreen = true 
+            this.loadingFullscreen = true
 
             console.log('开始请求付款接口')
             let data = {
@@ -173,7 +177,7 @@ export default {
                         let p = new Promise((resolve, reject) => {
                             return resolve(this.loadingFullscreen = false)
                         })
-                        p.then(() => { 
+                        p.then(() => {
                             this.success_page_show = true
                             this.home_page_show = false
                         })
@@ -330,19 +334,24 @@ export default {
         },
         code_focus() {
             // 调试用
-            if (process.env.NODE_ENV != 'production') {
-                console.log('验证码获得了焦点')
-                let body_h = document.body.clientHeight
-                let window_h = window.screen.height
-                console.log(body_h, window_h)
-                document.body.height = window_h + 'px'
+            if (process.env.NODE_ENV != 'production') { 
+
             }
         }
     },
-    mounted() {
-        this.load_payment_page()
-    }
+    created() {
 
+    },
+    mounted() {
+        this.load_payment_page()  
+
+        // 处理安卓手机软键盘的兼容性问题
+        window.addEventListener('resize', function() {
+            if (document.activeElement.tagName === 'INPUT') {
+                document.activeElement.scrollIntoView({ behavior: "smooth" })
+            }
+        })
+    }
 }
 
 </script>
@@ -400,32 +409,32 @@ export default {
                 color: #666;
                 vertical-align: top;
             }
-            ::-webkit-input-placeholder {
+             ::-webkit-input-placeholder {
                 color: #ccc;
                 font-family: 'PingFang-SC-Medium';
                 font-size: 0.27rem;
-                font-weight: normal; 
+                font-weight: normal;
                 padding-top: 0.04rem;
             }
-            :-moz-placeholder {
+             :-moz-placeholder {
                 color: #ccc;
                 font-family: 'PingFang-SC-Medium';
                 font-size: 0.27rem;
-                font-weight: normal; 
+                font-weight: normal;
                 padding-top: 0.04rem;
             }
-            ::-moz-placeholder {
+             ::-moz-placeholder {
                 color: #ccc;
                 font-family: 'PingFang-SC-Medium';
                 font-size: 0.27rem;
-                font-weight: normal; 
+                font-weight: normal;
                 padding-top: 0.04rem;
             }
-            :-ms-input-placeholder {
+             :-ms-input-placeholder {
                 color: #ccc;
                 font-family: 'PingFang-SC-Medium';
                 font-size: 0.27rem;
-                font-weight: normal; 
+                font-weight: normal;
                 padding-top: 0.04rem;
             }
         }
@@ -437,7 +446,7 @@ export default {
             border-top: 1px solid #f3f3f3;
             position: relative;
             .get-code {
-                font-size: 0.28rem; 
+                font-size: 0.28rem;
                 color: #666;
                 position: absolute;
                 right: 0.2rem;
@@ -447,7 +456,7 @@ export default {
                 display: inline;
                 background: transparent;
                 border: none;
-                padding:0;
+                padding: 0;
             }
         }
     }
@@ -466,7 +475,7 @@ export default {
     .phone-calling {
         width: 100%;
         height: 0.4rem;
-        line-height: 0.4rem; 
+        line-height: 0.4rem;
         text-align: center;
         color: #666;
         font-size: 0.24rem;
@@ -477,8 +486,8 @@ export default {
             font-size: 0.24rem;
             padding: 0 0.05rem;
         }
-    } 
-    .msg-box-wrap { 
+    }
+    .msg-box-wrap {
         position: fixed;
         left: 0;
         bottom: 0;
@@ -539,120 +548,121 @@ export default {
 }
 
 </style>
-
 <style scoped lang="scss">
-    .success-tip-wrap {
-        width: 100%;
-        height: 100%;
-        background: #fff;
-        font-family: 'PingFang-SC-Medium';
-        text-align: center; 
-        .pic-money {
-            padding: 0.48rem 0 0.4rem 0; 
-            img {
-                width: 6.76rem;
-                height: 3.38rem; 
-            }
+.success-tip-wrap {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    font-family: 'PingFang-SC-Medium';
+    text-align: center;
+    .pic-money {
+        padding: 0.48rem 0 0.4rem 0;
+        img {
+            width: 6.76rem;
+            height: 3.38rem;
         }
-        .notify {
-            height: 0.36rem;
-            line-height: 0.36rem; 
-            font-size: 0.36rem;
-            color: #333;
-        }
-        .desc {
-            line-height: 0.7rem;
-            padding-bottom: 0.2rem;
-            font-size: 0.28rem;
-            color: #666;
-        }
-        .line {
-            height: 0.24rem;
-            background:#F8F8F8;
-        }
-        .pic {
-            width: 7.5rem;
-            height: 7.4rem;
-            img {
-                width: 100%;
-                height: 100%;
-            }
-        } 
     }
+    .notify {
+        height: 0.36rem;
+        line-height: 0.36rem;
+        font-size: 0.36rem;
+        color: #333;
+    }
+    .desc {
+        line-height: 0.7rem;
+        padding-bottom: 0.2rem;
+        font-size: 0.28rem;
+        color: #666;
+    }
+    .line {
+        height: 0.24rem;
+        background: #F8F8F8;
+    }
+    .pic {
+        width: 7.5rem;
+        height: 7.4rem;
+        img {
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
 </style>
 <style scoped lang="scss">
-    .active-wrap {
-        width: 100%;
-        height: 100%;
-        background: #fff;
-        font-family: 'PingFang-SC-Medium';
-        text-align: center;
-        .tit {
-            height: 0.88rem;
-            line-height: 0.88rem;
-            font-size: 0.36rem; 
-            font-weight: bold;
-            color: #333;
+.active-wrap {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    font-family: 'PingFang-SC-Medium';
+    text-align: center;
+    .tit {
+        height: 0.88rem;
+        line-height: 0.88rem;
+        font-size: 0.36rem;
+        font-weight: bold;
+        color: #333;
+    }
+    .pic-money {
+        padding: 0.48rem 0 0.4rem 0;
+        img {
+            width: 6.76rem;
+            height: 3.38rem;
         }
-        .pic-money {
-            padding: 0.48rem 0 0.4rem 0; 
+    }
+    .notify {
+        height: 0.36rem;
+        line-height: 0.36rem;
+        font-size: 0.36rem;
+        color: #333;
+    }
+    .desc {
+        line-height: 0.7rem;
+        padding-bottom: 0.2rem;
+        font-size: 0.28rem;
+        color: #666;
+    }
+    .line {
+        height: 0.24rem;
+        background: #F8F8F8;
+    }
+    .pic-active {
+        width: 7.5rem;
+        height: 8.5rem;
+        .active-text {
+            width: 100%;
+            height: 1rem;
+            position: relative;
+            .text-line {
+                position: absolute;
+                width: 4.06rem;
+                height: 1px;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                background: #E5E5E5;
+            }
+            .text {
+                position: absolute;
+                width: 0.86rem;
+                height: 0.24rem;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 0.24rem;
+                line-height: 0.24rem;
+                background: #fff;
+                color: #ccc;
+            }
+        }
+        .active-url {
+            height: 3.6rem;
             img {
-                width: 6.76rem;
-                height: 3.38rem; 
-            }
-        }
-        .notify {
-            height: 0.36rem;
-            line-height: 0.36rem; 
-            font-size: 0.36rem;
-            color: #333;
-        }
-        .desc {
-            line-height: 0.7rem;
-            padding-bottom: 0.2rem;
-            font-size: 0.28rem;
-            color: #666;
-        }
-        .line {
-            height: 0.24rem;
-            background:#F8F8F8;
-        }
-        .pic-active {
-            width: 7.5rem;
-            height: 8.5rem;
-            .active-text { 
-                width: 100%;
-                height: 1rem; 
-                position: relative;
-                .text-line {
-                    position: absolute;
-                    width: 4.06rem;
-                    height: 1px;
-                    left: 50%;
-                    top: 50%;
-                    transform: translate(-50%,-50%);
-                    background: #E5E5E5;
-                }
-                .text {
-                    position: absolute;
-                    width: 0.86rem;
-                    height: 0.24rem;
-                    left: 50%;
-                    top: 50%;
-                    transform: translate(-50%,-50%);
-                    font-size: 0.24rem;
-                    line-height: 0.24rem;
-                    background: #fff;
-                    color: #ccc;
-                }
-            }
-            .active-url {
-                height: 3.6rem; 
-                img {
-                    width: 6.54rem;
-                    height: 3.6rem;
-                }
+                width: 6.54rem;
+                height: 3.6rem;
             }
         }
     }
+}
+
 </style>
