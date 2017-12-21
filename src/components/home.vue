@@ -248,12 +248,12 @@ export default {
         load_payment_page() {
             let wechatCode = util.getUrlParam('code') || '',
                 payToken = util.getUrlParam('payToken') || ''
-            // 开发环境调试，code和token写死
-            console.log(`wechatCode是${wechatCode}\n`, `payToken是${payToken}`)
+            // 开发环境调试，code和token写死 
             if (process.env.NODE_ENV != 'production') {
                 wechatCode = '013cHTRe0fmuXA1IIMQe0h7VRe0cHTR6'
                 payToken = '20f517fc346df8b25bf0681d464a404d'
             }
+            console.log(`wechatCode是${wechatCode}\n`, `payToken是${payToken}`)
             this.payToken = payToken
             this.wechatCode = wechatCode
             let params = {
